@@ -1691,27 +1691,42 @@ a {
   }
 
   .hero-media-block {
-    height: 320px;
+    height: auto;
     margin: 0 auto;
     width: 100%;
     max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hero-img {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
   }
 
   .hero-img--main {
-    width: 220px;
-    height: 280px;
+    width: 90%;
+    height: 240px;
+    z-index: 1;
   }
 
   .hero-img--secondary {
-    width: 180px;
-    height: 160px;
+    width: 75%;
+    height: 200px;
+    z-index: 2;
   }
 
   .hero-latest {
     position: relative;
     bottom: auto;
     right: auto;
-    margin-top: 20px;
+    width: 90%;
+    margin-top: 8px;
   }
 
   .hero-bottom {

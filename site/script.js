@@ -3,6 +3,19 @@
    JavaScript - Navigation, Scroll, Animations
    ============================================= */
 
+// --- EmailJS config for the Discipleship sign-up form ---
+// Fill these in from your EmailJS account (emailjs.com):
+//   PUBLIC_KEY  -> Account > General
+//   SERVICE_ID  -> Email Services (the Gmail service you connect)
+//   TEMPLATE_ID -> Email Templates (the template that sends to your Gmail inbox)
+const EMAILJS_PUBLIC_KEY = 'iastLPQ81i5GK9Znv';
+const EMAILJS_SERVICE_ID = 'service_sp9cn7b';
+const EMAILJS_TEMPLATE_ID = 'template_2cf0z4a';
+
+if (typeof emailjs !== 'undefined') {
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
   // --- Mobile Navigation Toggle ---
@@ -238,29 +251,29 @@ document.addEventListener('DOMContentLoaded', () => {
       status.textContent = '';
       status.className = 'signup-form-status';
 
-      try {
-        const response = await fetch(signupForm.action, {
-          method: 'POST',
-          body: new FormData(signupForm),
-          headers: { Accept: 'application/json' }
-        });
+      const data = new FormData(signupForm);
+      const lines = [];
+      for (const [key, value] of data.entries()) {
+        if (value) lines.push(`${key}: ${value}`);
+      }
 
-        if (response.ok) {
-          signupForm.reset();
-          status.textContent = 'Thank you for signing up. A discipleship leader will follow up with you soon.';
-          status.classList.add('is-success');
-          submitBtn.textContent = '( Submitted )';
-          status.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-          const data = await response.json().catch(() => ({}));
-          const msg = data.errors ? data.errors.map(err => err.message).join(', ') : 'Something went wrong. Please try again.';
-          status.textContent = msg;
-          status.classList.add('is-error');
-          submitBtn.textContent = '( Submit Sign-Up )';
-          submitBtn.disabled = false;
-        }
+      const params = {
+        name: `${data.get('First Name') || ''} ${data.get('Last Name') || ''}`.trim(),
+        email: data.get('Email') || '',
+        title: 'New Discipleship Program Sign-Up',
+        message: lines.join('\n')
+      };
+
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+
+        signupForm.reset();
+        status.textContent = 'Thank you for signing up. A discipleship leader will follow up with you soon.';
+        status.classList.add('is-success');
+        submitBtn.textContent = '( Submitted )';
+        status.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } catch (err) {
-        status.textContent = 'Network error. Please check your connection and try again.';
+        status.textContent = 'Something went wrong. Please try again, or contact us directly.';
         status.classList.add('is-error');
         submitBtn.textContent = '( Submit Sign-Up )';
         submitBtn.disabled = false;
